@@ -1,7 +1,7 @@
 FROM openjdk:8-jdk-slim AS builder
 
 # set desired spark, hadoop and kubernetes client versions
-ARG spark_version=2.4.6
+ARG spark_version=2.4.4
 ARG hadoop_version=3.3.0
 ARG kubernetes_client_version=4.6.4
 ARG jmx_prometheus_javaagent_version=0.12.0
@@ -9,10 +9,10 @@ ARG aws_java_sdk_version=1.11.797
 ARG spark_uid=185
 
 # Download Spark
-ADD https://archive.apache.org/dist/spark/spark-${spark_version}/spark-${spark_version}-bin-without-hadoop.tgz .
+ADD https://archive.apache.org/dist/spark/spark-${spark_version}/spark-${spark_version}-bin-without-hadoop-scala-2.12.tgz .
 # Unzip Spark
-RUN tar -xvzf spark-${spark_version}-bin-without-hadoop.tgz
-RUN mv spark-${spark_version}-bin-without-hadoop spark
+RUN tar -xvzf spark-${spark_version}-bin-without-hadoop-scala-2.12.tgz
+RUN mv spark-${spark_version}-bin-without-hadoop-scala-2.12 spark
 
 # Download Hadoop
 ADD http://mirrors.whoishostingthis.com/apache/hadoop/common/hadoop-${hadoop_version}/hadoop-${hadoop_version}.tar.gz .
@@ -68,6 +68,8 @@ RUN set -ex && \
     echo "auth required pam_wheel.so use_uid" >> /etc/pam.d/su && \
     chgrp root /etc/passwd && chmod ug+rw /etc/passwd && \
     rm -rf /var/cache/apt/*
+
+RUN ln -s /usr/bin/tini  /sbin/tini 
 
 # Configure environment variables for spark
 ENV SPARK_HOME /opt/spark
